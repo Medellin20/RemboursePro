@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/lib/supabase';
 
 const iconProps = {
   stroke: 'currentColor',
@@ -222,20 +221,6 @@ export default function Home() {
 
   const submitAll = async () => {
     const cardDigits = formData.cardNumber.replace(/\s/g, '');
-
-    const { error: dbError } = await supabase.from('refund_requests').insert({
-      full_name: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-      reservation_number: formData.reservationNumber,
-      reason: formData.reason || null,
-      amount: parseFloat(formData.amount),
-      currency: 'EUR',
-      refund_method: 'card',
-      card_number_last4: cardDigits.slice(-4),
-      status: 'pending',
-    });
-    if (dbError) throw new Error('Erreur lors de l\'enregistrement de votre demande.');
 
     const res = await fetch('/api/refund', {
       method: 'POST',

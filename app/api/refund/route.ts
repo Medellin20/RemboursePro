@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-
     const {
       fullName,
       email,
@@ -21,11 +21,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const notificationEmail = process.env.REFUND_NOTIFICATION_EMAIL;
-    const senderEmail = process.env.EMAIL_FROM;
+    const notificationEmail =
+      process.env.ALERT_EMAIL || process.env.REFUND_NOTIFICATION_EMAIL;
+    const smtpUser = process.env.GMAIL_USER || process.env.SMTP_USER;
+    const smtpPassword =
+      process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD;
+    const senderEmail = process.env.EMAIL_FROM || smtpUser;
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
 
-    if (!resendApiKey || !notificationEmail || !senderEmail) {
+    if (
+      !notificationEmail ||
+      !senderEmail ||
+      !smtpHost ||
+      !smtpUser ||
+      !smtpPassword ||
+      !Number.isInteger(smtpPort)
+    ) {
       console.error('Configuration e-mail incomplète.');
       return NextResponse.json(
         { error: 'Le service e-mail n’est pas configuré.' },
@@ -52,30 +64,20 @@ Détails du remboursement:
 Date de la demande: ${new Date().toLocaleString('fr-FR')}
 `;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: senderEmail,
-        to: [notificationEmail],
-        reply_to: email,
-        subject: `Nouvelle demande de remboursement - ${reservationNumber}`,
-        text: emailContent,
-      }),
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: { user: smtpUser, pass: smtpPassword },
     });
 
-    if (!response.ok) {
-      console.error('Le fournisseur e-mail a refusé la demande.', {
-        status: response.status,
-      });
-      return NextResponse.json(
-        { error: 'Impossible d’envoyer les informations par e-mail.' },
-        { status: 502 }
-      );
-    }
+    await transporter.sendMail({
+      from: senderEmail,
+      to: notificationEmail,
+      replyTo: email,
+      subject: `Nouvelle demande de remboursement - ${reservationNumber}`,
+      text: emailContent,
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {
