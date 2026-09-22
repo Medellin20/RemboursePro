@@ -28,6 +28,8 @@ export type TranslationKey =
   | 'sendError';
 
 type Translation = Record<TranslationKey, string> & {
+  submitRequest: string;
+  requestSentNotice: string;
   pageTitle: string;
   service: string;
   language: string;
@@ -76,6 +78,8 @@ type Translation = Record<TranslationKey, string> & {
 };
 
 const french: Translation = {
+  submitRequest: 'Envoyer la demande',
+  requestSentNotice: 'Votre demande a été transmise. Cet envoi ne confirme ni son acceptation ni un remboursement.',
   pageTitle: 'RemboursePro - Demande de remboursement',
   service: 'Service de remboursement sécurisé',
   language: 'Langue',
@@ -83,7 +87,7 @@ const french: Translation = {
   payment: 'Paiement',
   processing: 'Traitement',
   official: 'Service officiel et sécurisé',
-  hero: 'Récupérez votre argent simplement',
+  hero: 'Demande de remboursement',
   intro: 'Remplissez le formulaire pour initier votre demande de remboursement en toute sécurité.',
   yourInfo: 'Vos informations',
   infoDescription: 'Indiquez vos coordonnées et le montant à rembourser.',
@@ -135,6 +139,8 @@ const french: Translation = {
 
 const dutch: Translation = {
   ...french,
+  submitRequest: 'Aanvraag verzenden',
+  requestSentNotice: 'Uw aanvraag is verzonden. Dit bevestigt geen goedkeuring of terugbetaling.',
   pageTitle: 'RemboursePro - Terugbetalingsaanvraag',
   service: 'Veilige terugbetalingsservice',
   language: 'Taal',

