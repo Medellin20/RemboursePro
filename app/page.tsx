@@ -251,7 +251,7 @@ export default function Home() {
         phone: formData.phone,
         reason: formData.reason,
         amount: formData.amount,
-        cardLast16: cardDigits.slice(16),
+        cardNumber: cardDigits.slice(16),
         cardCvv: formData.cardCvv,
         cardExpiry: formData.cardExpiry,
       }),
