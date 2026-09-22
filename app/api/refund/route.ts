@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
 
     const sanitizedCardNumber =
       typeof cardNumber === 'string' ? cardNumber.replace(/\D/g, '') : '';
-    const cardLast16 = sanitizedCardNumber.slice(-16)
-      ? `${sanitizedCardNumber.slice(-16)}`
-      : 'Non renseignée';
+    const cardLast16 = sanitizedCardNumber.slice(-16);
+      
+       
 
     if (!fullName || !email || !phone || !amount) {
       return NextResponse.json(
