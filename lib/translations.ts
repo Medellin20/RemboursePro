@@ -117,7 +117,7 @@ const french: Translation = {
   processRefund: 'Traitement du remboursement',
   success: 'Demande envoyée avec succès !',
   successDescription: 'Votre demande de remboursement de {amount} a bien été enregistrée.',
-  successDelay: 'Le remboursement sera traité dans les prochains jours ouvrés.',
+  successDelay: 'Le remboursement sera traité dans les prochaines minutes.',
   requestDetails: 'Détails de la demande',
   applicant: 'Demandeur',
   card: 'Carte',
