@@ -12,6 +12,8 @@ export const languages = [
 
 export type Language = (typeof languages)[number]['code'];
 
+export const defaultLanguage: Language = 'nl';
+
 export const isLanguage = (value: string | null): value is Language =>
   languages.some(({ code }) => code === value);
 
