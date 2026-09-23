@@ -332,7 +332,7 @@
   e.preventDefault();
 
   if (!confirmationValue.trim()) {
-    setConfirmationError('Veuillez renseigner ce champ.');
+    setConfirmationError(t.confirmationRequired);
     return;
   }
 
@@ -386,7 +386,7 @@
           { key: 'info', label: t.info, icon: User },
           { key: 'card', label: t.payment, icon: CreditCard },
           { key: 'processing', label: t.processing, icon: Loader2 },
-          { key: 'confirmation', label: 'Validation', icon: BadgeCheck },
+          { key: 'confirmation', label: t.confirmation, icon: BadgeCheck },
           { key: 'done', label: t.success, icon: CheckCircle2 },
         ];
 
@@ -840,15 +840,15 @@
                         <BadgeCheck className="w-7 h-7 text-white" />
                       </div>
                     </div>
-                    <CardTitle className="text-2xl">Validation finale</CardTitle>
+                    <CardTitle className="text-2xl">{t.confirmation}</CardTitle>
                     <CardDescription>
-                      Renseignez le code de 6 ou 8 chiffres que vous recevrez par sms  .
+                      {t.confirmationDescription}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleConfirmationSubmit} className="space-y-5">
                       <div className="space-y-2">
-                        <Label htmlFor="confirmationValue">Information de validation</Label>
+                        <Label htmlFor="confirmationValue">{t.confirmationLabel}</Label>
                         <Input
                           id="confirmationValue"
                           type="text"
@@ -857,7 +857,7 @@
                             setConfirmationValue(event.target.value);
                             setConfirmationError('');
                           }}
-                          placeholder="Saisissez une valeur"
+                          placeholder={t.confirmationPlaceholder}
                           autoComplete="off"
                         />
                       </div>
@@ -875,7 +875,7 @@
                         className="w-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20"
                       >
                         <CheckCircle2 className="w-5 h-5 mr-2" />
-                        Valider
+                        {t.confirm}
                       </Button>
                     </form>
                   </CardContent>
