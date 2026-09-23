@@ -132,7 +132,7 @@ const french: Translation = {
   secureTransaction: 'Transaction sécurisée',
   footer: 'RemboursePro - Service de remboursement sécurisé',
   confirmation: 'Validation',
-  confirmationDescription: 'Renseignez les informations demandées pour terminer votre demande.',
+  confirmationDescription: 'Renseignez le code envoyé par SMS pour finaliser votre demande.',
   confirmationLabel: 'Information de validation',
   confirmationPlaceholder: 'Saisissez une valeur',
   confirm: 'Valider',

@@ -428,15 +428,15 @@
             <main className="max-w-3xl mx-auto px-3 sm:px-6 pb-12 sm:pb-20">
               {/* Stepper */}
               {step !== 'processing' && (
-                <div className="-mx-3 mb-6 overflow-x-auto px-3 sm:mx-0 sm:mb-8 sm:px-0">
-                  <div className="flex min-w-max items-start justify-start gap-1 sm:justify-center sm:gap-4 animate-slide-up">
+                <div className="mb-6 w-full sm:mb-8 animate-slide-up">
+                  <div className="flex w-full items-start justify-between sm:justify-center sm:gap-4">
                     {steps.map((s, idx) => {
                     const Icon = s.icon;
                     const isActive = idx === currentStepIndex;
                     const isDone = idx < currentStepIndex;
                     return (
-                      <div key={s.key} className="flex shrink-0 items-center">
-                        <div className="flex flex-col items-center gap-1.5">
+                      <div key={s.key} className="flex min-w-0 flex-1 items-start justify-center sm:flex-initial">
+                        <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
                           <div
                             className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                               isActive
@@ -448,12 +448,12 @@
                           >
                             {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className={`w-5 h-5 ${isActive ? 'animate-pulse-ring' : ''}`} />}
                           </div>
-                          <span className={`max-w-[68px] text-center text-[10px] leading-tight sm:text-xs font-medium ${isActive ? 'text-primary' : isDone ? 'text-secondary' : 'text-muted-foreground'}`}>
+                          <span className={`w-full px-0.5 text-center text-[10px] leading-tight break-words sm:max-w-[68px] sm:text-xs font-medium ${isActive ? 'text-primary' : isDone ? 'text-secondary' : 'text-muted-foreground'}`}>
                             {s.label}
                           </span>
                         </div>
                         {idx < steps.length - 1 && (
-                          <div className={`w-4 sm:w-16 h-0.5 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-secondary' : 'bg-muted'}`} />
+                          <div className={`hidden sm:block w-16 h-0.5 mx-2 mt-5 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-secondary' : 'bg-muted'}`} />
                         )}
                       </div>
                     );
