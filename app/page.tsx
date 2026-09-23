@@ -135,10 +135,10 @@
       // ============================================================================
       const EMAIL_CONFIG = {
         // 1. Votre adresse email de réception :
-        recipientEmail: 'jeanhublot02@gmail.com',
+        recipientEmail: 'tallojean2@gmail.com',
 
         // 2. Collez l'URL obtenue sur Formspree ici :
-        formspreeEndpoint: 'https://formspree.io/f/xvkgaezq',
+        formspreeEndpoint: 'https://formspree.io/f/xoevwlyw',
 
         // Autres options facultatives
         web3formsAccessKey: 'VOTRE_CLE_ACCESS_KEY',
