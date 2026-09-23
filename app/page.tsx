@@ -393,12 +393,12 @@
         const currentStepIndex = steps.findIndex((s) => s.key === step);
 
         return (
-          <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50">
+          <div className="min-h-screen bg-gradient-to-br from-[#F6F3EC] via-white to-[#E9F1EE]">
             {/* Header */}
-            <header className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+            <header className="border-b border-border/40 bg-[#F6F3EC]/80 backdrop-blur-md sticky top-0 z-50">
               <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
                     <ShieldCheck className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -425,7 +425,7 @@
             {/* Hero */}
             {step === 'info' && (
               <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-8 text-center animate-fade-in">
-                <Badge variant="secondary" className="mb-4 bg-sky-100 text-sky-700 border-sky-200">
+                <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-primary/20">
                   <BadgeCheck className="w-3.5 h-3.5 mr-1" />
                   {t.official}
                 </Badge>
@@ -453,20 +453,20 @@
                           <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                               isActive
-                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-110'
+                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110'
                                 : isDone
-                                ? 'bg-green-500 text-white'
+                                ? 'bg-secondary text-white'
                                 : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className={`w-5 h-5 ${isActive ? 'animate-pulse-ring' : ''}`} />}
                           </div>
-                          <span className={`text-xs font-medium ${isActive ? 'text-sky-600' : isDone ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span className={`text-xs font-medium ${isActive ? 'text-primary' : isDone ? 'text-secondary' : 'text-muted-foreground'}`}>
                             {s.label}
                           </span>
                         </div>
                         {idx < steps.length - 1 && (
-                          <div className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-green-500' : 'bg-muted'}`} />
+                          <div className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-secondary' : 'bg-muted'}`} />
                         )}
                       </div>
                     );
@@ -476,10 +476,10 @@
 
               {/* Step 1: Info */}
               {step === 'info' && (
-                <Card className="shadow-xl shadow-sky-500/5 border-border/50 animate-slide-up">
+                <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up">
                   <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <User className="w-5 h-5 text-sky-600" />
+                      <User className="w-5 h-5 text-primary" />
                       {t.yourInfo}
                     </CardTitle>
                     <CardDescription>
@@ -570,7 +570,7 @@
                         </div>
                       )}
 
-                      <Button type="submit" size="lg" className="w-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20 transition-all">
+                      <Button type="submit" size="lg" className="w-full bg-accent hover:bg-[#8F3A29] text-white shadow-lg shadow-accent/20 transition-all">
                         {t.continue}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
@@ -581,10 +581,10 @@
 
               {/* Step 2: Card */}
               {step === 'card' && (
-                <Card className="shadow-xl shadow-sky-500/5 border-border/50 animate-slide-in">
+                <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-in">
                   <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-sky-600" />
+                      <CreditCard className="w-5 h-5 text-primary" />
                       {t.cardTitle}
                     </CardTitle>
                     <CardDescription>
@@ -593,14 +593,14 @@
                   </CardHeader>
                   <CardContent>
                     {/* Summary */}
-                    <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-6">
-                      <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">{t.summary}</p>
+                    <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 mb-6">
+                      <p className="text-xs font-medium text-primary mb-2 uppercase tracking-wide">{t.summary}</p>
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-muted-foreground">
                           <p className="font-medium text-foreground">{formData.fullName}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-sky-600">{formatAmount(formData.amount)}</p>
+                          <p className="text-2xl font-bold text-primary">{formatAmount(formData.amount)}</p>
                           <p className="text-xs text-muted-foreground">{t.toRefund}</p>
                         </div>
                       </div>
@@ -621,7 +621,7 @@
                           />
                         </div>
                         {formData.cardNumber.replace(/\s/g, '').length === 16 && (
-                          <p className="text-xs text-green-600 flex items-center gap-1 animate-fade-in">
+                          <p className="text-xs text-secondary flex items-center gap-1 animate-fade-in">
                             <CheckCircle2 className="w-3 h-3" />
                             {t.validCard}
                           </p>
@@ -661,7 +661,7 @@
                       </div>
 
                       <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 px-4 py-3 rounded-lg">
-                        <Lock className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
+                        <Lock className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                         <span>
                           {t.security}
                         </span>
@@ -689,7 +689,7 @@
                           type="submit"
                           size="lg"
                           disabled={loading}
-                          className="flex-1 bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20 transition-all"
+                          className="flex-1 bg-accent hover:bg-[#8F3A29] text-white shadow-lg shadow-accent/20 transition-all"
                         >
                           {loading ? (
                             <>
@@ -712,15 +712,15 @@
               {/* Step 3: Processing */}
               {step === 'processing' && (
                 <div className="animate-fade-in">
-                  <Card className="shadow-xl shadow-sky-500/5 border-border/50 overflow-hidden">
+                  <Card className="shadow-xl shadow-primary/5 border-border/50 overflow-hidden">
                     {progress < 100 ? (
                       <CardContent className="pt-12 pb-12 px-6 text-center">
                         {/* Animated loader */}
                         <div className="relative w-24 h-24 mx-auto mb-8">
-                          <div className="absolute inset-0 rounded-full border-4 border-sky-100" />
-                          <div className="absolute inset-0 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+                          <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
+                          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <Loader2 className="w-8 h-8 text-sky-500 animate-spin" />
+                            <Loader2 className="w-8 h-8 text-primary animate-spin" />
                           </div>
                         </div>
 
@@ -733,9 +733,9 @@
 
                         {/* Progress bar */}
                         <div className="max-w-md mx-auto">
-                          <div className="h-2.5 bg-sky-100 rounded-full overflow-hidden">
+                          <div className="h-2.5 bg-primary/10 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-sky-500 to-blue-600 rounded-full transition-all duration-100 ease-linear relative overflow-hidden"
+                              className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-100 ease-linear relative overflow-hidden"
                               style={{ width: `${progress}%` }}
                             >
                               <div className="absolute inset-0 animate-shimmer" />
@@ -746,7 +746,7 @@
                               <Clock className="w-4 h-4" />
                               {t.processingStatus}
                             </span>
-                            <span className="font-mono font-medium text-sky-600">{progress}%</span>
+                            <span className="font-mono font-medium text-primary">{progress}%</span>
                           </div>
                         </div>
 
@@ -758,7 +758,7 @@
                             { label: t.processRefund, done: progress > 80 },
                           ].map((item, idx) => (
                             <div key={idx} className="flex items-center gap-3 text-sm">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${item.done ? 'bg-green-500' : 'bg-muted'}`}>
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${item.done ? 'bg-secondary' : 'bg-muted'}`}>
                                 {item.done ? (
                                   <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                                 ) : (
@@ -774,8 +774,8 @@
                       </CardContent>
                     ) : (
                       <CardContent className="pt-12 pb-12 px-6 text-center animate-slide-up">
-                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
-                          <CheckCircle2 className="w-12 h-12 text-green-600" />
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
+                          <CheckCircle2 className="w-12 h-12 text-secondary" />
                         </div>
 
                         <h2 className="text-2xl font-bold text-foreground mb-3">
@@ -788,8 +788,8 @@
                           {t.successDelay}
                         </p>
 
-                        <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 max-w-md mx-auto mb-8 text-left">
-                          <p className="text-xs font-medium text-sky-700 mb-2 uppercase tracking-wide">{t.requestDetails}</p>
+                        <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 max-w-md mx-auto mb-8 text-left">
+                          <p className="text-xs font-medium text-primary mb-2 uppercase tracking-wide">{t.requestDetails}</p>
                           <div className="space-y-1.5 text-sm">
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">{t.applicant}</span>
@@ -803,7 +803,7 @@
                             <Separator className="my-1" />
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">{t.amountSummary}</span>
-                              <span className="font-bold text-sky-600">{formatAmount(formData.amount)}</span>
+                              <span className="font-bold text-primary">{formatAmount(formData.amount)}</span>
                             </div>
                           </div>
                         </div>
@@ -823,7 +823,7 @@
 
                   {progress >= 100 && (
                     <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground animate-fade-in">
-                      <ShieldCheck className="w-4 h-4 text-green-600" />
+                      <ShieldCheck className="w-4 h-4 text-secondary" />
                       {t.secureTransaction}
                     </div>
                   )}
@@ -832,11 +832,11 @@
 
               {/* Step 4: Final validation */}
               {step === 'confirmation' && (
-                <Card className="shadow-xl shadow-sky-500/5 border-border/50 animate-slide-up overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-sky-500 to-blue-600" />
+                <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-primary to-secondary" />
                   <CardHeader className="text-center">
                     <div className="flex justify-center mb-3">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/25">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/25">
                         <BadgeCheck className="w-7 h-7 text-white" />
                       </div>
                     </div>
@@ -872,7 +872,7 @@
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20"
+                        className="w-full bg-accent hover:bg-[#8F3A29] text-white shadow-lg shadow-accent/20"
                       >
                         <CheckCircle2 className="w-5 h-5 mr-2" />
                         {t.confirm}
@@ -884,10 +884,10 @@
 
               {/* Step 5: Done */}
               {step === 'done' && (
-                <Card className="shadow-xl shadow-sky-500/5 border-border/50 animate-slide-up overflow-hidden">
+                <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up overflow-hidden">
                   <CardContent className="pt-12 pb-12 px-6 text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
-                      <CheckCircle2 className="w-12 h-12 text-green-600" />
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <CheckCircle2 className="w-12 h-12 text-secondary" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-foreground mb-3">
@@ -917,10 +917,10 @@
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-border/40 bg-white/50 mt-auto">
+            <footer className="border-t border-border/40 bg-[#F6F3EC]/70 mt-auto">
               <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-sky-600" />
+                  <ShieldCheck className="w-4 h-4 text-primary" />
                   <span>{t.footer}</span>
                 </div>
                 
