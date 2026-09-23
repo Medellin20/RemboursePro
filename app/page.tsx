@@ -162,15 +162,6 @@
         const t = translations[language];
 
         useEffect(() => {
-          try {
-            const saved = localStorage.getItem('remboursepro-language');
-            if (isLanguage(saved)) setLanguage(saved);
-          } catch {
-            // The language selector also works when browser storage is unavailable.
-          }
-        }, []);
-
-        useEffect(() => {
           document.documentElement.lang = language;
           document.title = t.pageTitle;
         }, [language, t.pageTitle]);
@@ -178,11 +169,6 @@
         const changeLanguage = (value: string) => {
           if (!isLanguage(value)) return;
           setLanguage(value);
-          try {
-            localStorage.setItem('remboursepro-language', value);
-          } catch {
-            // Keep the selected language for the current visit.
-          }
         };
 
         const formatAmount = (value: string) =>
