@@ -393,26 +393,26 @@
         const currentStepIndex = steps.findIndex((s) => s.key === step);
 
         return (
-          <div className="min-h-screen bg-gradient-to-br from-[#F6F3EC] via-white to-[#E9F1EE]">
+          <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-[#F6F3EC] via-white to-[#E9F1EE]">
             {/* Header */}
             <header className="border-b border-border/40 bg-[#F6F3EC]/80 backdrop-blur-md sticky top-0 z-50">
-              <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+              <div className="max-w-5xl mx-auto px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
                     <ShieldCheck className="w-6 h-6 text-white" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h1 className="text-lg font-bold tracking-tight text-foreground">RemboursePro</h1>
                     <p className="text-xs text-muted-foreground hidden sm:block">{t.service}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Label htmlFor="language" className="text-muted-foreground">{t.language}</Label>
+                <div className="flex shrink-0 items-center gap-2 text-sm">
+                  <Label htmlFor="language" className="hidden min-[400px]:block text-muted-foreground">{t.language}</Label>
                   <select
                     id="language"
                     value={language}
                     onChange={(event) => changeLanguage(event.target.value)}
-                    className="h-10 max-w-[160px] rounded-md border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="h-10 max-w-[132px] sm:max-w-[160px] rounded-md border border-input bg-white px-2 sm:px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {languages.map(({ code, label }) => (
                       <option key={code} value={code} lang={code}>{label}</option>
@@ -424,12 +424,12 @@
 
             {/* Hero */}
             {step === 'info' && (
-              <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-8 text-center animate-fade-in">
-                <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-primary/20">
+              <section className="max-w-5xl mx-auto px-3 sm:px-6 pt-8 sm:pt-12 pb-6 sm:pb-8 text-center animate-fade-in">
+                <Badge variant="secondary" className="mb-4 max-w-full whitespace-normal bg-primary/10 text-primary border-primary/20">
                   <BadgeCheck className="w-3.5 h-3.5 mr-1" />
                   {t.official}
                 </Badge>
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-3">
+                <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground mb-3">
                   {t.hero}
                 </h2>
                 <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
@@ -439,19 +439,20 @@
             )}
 
             {/* Main */}
-            <main className="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
+            <main className="max-w-3xl mx-auto px-3 sm:px-6 pb-12 sm:pb-20">
               {/* Stepper */}
               {step !== 'processing' && (
-                <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8 animate-slide-up">
-                  {steps.map((s, idx) => {
+                <div className="-mx-3 mb-6 overflow-x-auto px-3 sm:mx-0 sm:mb-8 sm:px-0">
+                  <div className="flex min-w-max items-start justify-start gap-1 sm:justify-center sm:gap-4 animate-slide-up">
+                    {steps.map((s, idx) => {
                     const Icon = s.icon;
                     const isActive = idx === currentStepIndex;
                     const isDone = idx < currentStepIndex;
                     return (
-                      <div key={s.key} className="flex items-center">
+                      <div key={s.key} className="flex shrink-0 items-center">
                         <div className="flex flex-col items-center gap-1.5">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                               isActive
                                 ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110'
                                 : isDone
@@ -461,24 +462,25 @@
                           >
                             {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className={`w-5 h-5 ${isActive ? 'animate-pulse-ring' : ''}`} />}
                           </div>
-                          <span className={`text-xs font-medium ${isActive ? 'text-primary' : isDone ? 'text-secondary' : 'text-muted-foreground'}`}>
+                          <span className={`max-w-[68px] text-center text-[10px] leading-tight sm:text-xs font-medium ${isActive ? 'text-primary' : isDone ? 'text-secondary' : 'text-muted-foreground'}`}>
                             {s.label}
                           </span>
                         </div>
                         {idx < steps.length - 1 && (
-                          <div className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-secondary' : 'bg-muted'}`} />
+                          <div className={`w-4 sm:w-16 h-0.5 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-secondary' : 'bg-muted'}`} />
                         )}
                       </div>
                     );
-                  })}
+                    })}
+                  </div>
                 </div>
               )}
 
               {/* Step 1: Info */}
               {step === 'info' && (
                 <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up">
-                  <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
                       <User className="w-5 h-5 text-primary" />
                       {t.yourInfo}
                     </CardTitle>
@@ -486,9 +488,9 @@
                       {t.infoDescription}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                     <form onSubmit={handleInfoSubmit} className="space-y-5">
-                      <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="fullName">{t.fullName}</Label>
                           <div className="relative">
@@ -518,7 +520,7 @@
                         </div>
                       </div>
 
-                      <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="phone">{t.phone}</Label>
                           <div className="relative">
@@ -582,8 +584,8 @@
               {/* Step 2: Card */}
               {step === 'card' && (
                 <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-in">
-                  <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
                       <CreditCard className="w-5 h-5 text-primary" />
                       {t.cardTitle}
                     </CardTitle>
@@ -591,16 +593,16 @@
                       {t.cardDescription}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                     {/* Summary */}
                     <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 mb-6">
                       <p className="text-xs font-medium text-primary mb-2 uppercase tracking-wide">{t.summary}</p>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="text-sm text-muted-foreground">
                           <p className="font-medium text-foreground">{formData.fullName}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-primary">{formatAmount(formData.amount)}</p>
+                        <div className="text-left sm:text-right">
+                          <p className="text-xl sm:text-2xl font-bold text-primary">{formatAmount(formData.amount)}</p>
                           <p className="text-xs text-muted-foreground">{t.toRefund}</p>
                         </div>
                       </div>
@@ -628,7 +630,7 @@
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="cardExpiry">{t.expiry}</Label>
                           <div className="relative">
@@ -674,13 +676,13 @@
                         </div>
                       )}
 
-                      <div className="flex gap-3">
+                      <div className="flex flex-col-reverse gap-3 sm:flex-row">
                         <Button
                           type="button"
                           variant="outline"
                           size="lg"
                           onClick={() => setStep('info')}
-                          className="flex-shrink-0"
+                          className="w-full sm:w-auto"
                         >
                           <ArrowLeft className="w-5 h-5 mr-2" />
                           {t.back}
@@ -689,7 +691,7 @@
                           type="submit"
                           size="lg"
                           disabled={loading}
-                          className="flex-1 bg-accent hover:bg-[#8F3A29] text-white shadow-lg shadow-accent/20 transition-all"
+                          className="w-full flex-1 bg-accent hover:bg-[#8F3A29] text-white shadow-lg shadow-accent/20 transition-all"
                         >
                           {loading ? (
                             <>
@@ -714,7 +716,7 @@
                 <div className="animate-fade-in">
                   <Card className="shadow-xl shadow-primary/5 border-border/50 overflow-hidden">
                     {progress < 100 ? (
-                      <CardContent className="pt-12 pb-12 px-6 text-center">
+                      <CardContent className="px-4 py-10 text-center sm:px-6 sm:py-12">
                         {/* Animated loader */}
                         <div className="relative w-24 h-24 mx-auto mb-8">
                           <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
@@ -724,7 +726,7 @@
                           </div>
                         </div>
 
-                        <h2 className="text-2xl font-bold text-foreground mb-3">
+                        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
                           {t.wait}
                         </h2>
                         <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
@@ -773,7 +775,7 @@
                         </div>
                       </CardContent>
                     ) : (
-                      <CardContent className="pt-12 pb-12 px-6 text-center animate-slide-up">
+                      <CardContent className="px-4 py-10 text-center animate-slide-up sm:px-6 sm:py-12">
                         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
                           <CheckCircle2 className="w-12 h-12 text-secondary" />
                         </div>
@@ -834,18 +836,18 @@
               {step === 'confirmation' && (
                 <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up overflow-hidden">
                   <div className="h-1.5 bg-gradient-to-r from-primary to-secondary" />
-                  <CardHeader className="text-center">
+                  <CardHeader className="p-4 text-center sm:p-6">
                     <div className="flex justify-center mb-3">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/25">
                         <BadgeCheck className="w-7 h-7 text-white" />
                       </div>
                     </div>
-                    <CardTitle className="text-2xl">{t.confirmation}</CardTitle>
+                    <CardTitle className="text-xl sm:text-2xl">{t.confirmation}</CardTitle>
                     <CardDescription>
                       {t.confirmationDescription}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                     <form onSubmit={handleConfirmationSubmit} className="space-y-5">
                       <div className="space-y-2">
                         <Label htmlFor="confirmationValue">{t.confirmationLabel}</Label>
@@ -885,12 +887,12 @@
               {/* Step 5: Done */}
               {step === 'done' && (
                 <Card className="shadow-xl shadow-primary/5 border-border/50 animate-slide-up overflow-hidden">
-                  <CardContent className="pt-12 pb-12 px-6 text-center">
+                  <CardContent className="px-4 py-10 text-center sm:px-6 sm:py-12">
                     <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
                       <CheckCircle2 className="w-12 h-12 text-secondary" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-foreground mb-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
                       {t.success}
                     </h2>
 
